@@ -16,7 +16,7 @@ export function LoginPage() {
 	return (
 		<Container>
 			<div className="flex justify-between">
-				<div className="hidden lg:flex lg:w-[60%] min-h-screen flex-col justify-center items-center text-primary-foreground bg-gradient-to-br from-primary to-primary-light">
+				<div className="hidden lg:flex lg:w-[60%] min-h-screen flex-col justify-center items-center text-primary-foreground bg-primary">
 					<h1 className="text-4xl tracking-widest font-light mb-[32px]">
 						Tokenlab Calendar
 						<Calendar size={32} className="inline ml-4" />

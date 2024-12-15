@@ -76,9 +76,16 @@ export function LoginForm() {
 					)}
 				/>
 				<div>
-					<p>
-						New to Tokenlab ? <Button variant="link" type="button" onClick={() => navigate("/signup")}>Create an account</Button>
-					</p>
+					<div className="flex items-center">
+						New to Tokenlab ?
+						<Button
+							variant="link"
+							type="button"
+							onClick={() => navigate("/signup")}
+							className="m-0 p-0 text-sm mx-3 underline hover:no-underline">
+							Create an account
+						</Button>
+					</div>
 
 				</div>
 

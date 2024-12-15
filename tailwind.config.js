@@ -3,6 +3,9 @@ module.exports = {
         darkMode: ["class"],
         content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
         theme: {
+                fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                },
                 extend: {
                         borderRadius: {
                                 lg: 'var(--radius)',
@@ -22,10 +25,6 @@ module.exports = {
                                 },
                                 primary: {
                                         DEFAULT: 'hsl(var(--primary))',
-                                        foreground: 'hsl(var(--primary-foreground))'
-                                },
-                                "primary-light": {
-                                        DEFAULT: 'hsl(var(--primary-light))',
                                         foreground: 'hsl(var(--primary-foreground))'
                                 },
                                 secondary: {
@@ -54,7 +53,8 @@ module.exports = {
                                         '4': 'hsl(var(--chart-4))',
                                         '5': 'hsl(var(--chart-5))'
                                 }
-                        }
+                        },
+
                 }
         },
         plugins: [require("tailwindcss-animate")],

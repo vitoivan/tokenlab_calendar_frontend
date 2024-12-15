@@ -1,25 +1,38 @@
-import { getUserById } from "@/api/requests/users/get-by-id";
 import { Container } from "@/components/container/container";
 import { Button } from "@/components/ui/button";
-import { useAPI } from "@/hooks/useAPI";
+import { Calendar } from "@/components/ui/calendar";
+import { useAuthContext } from "@/context/auth-context/auth-context";
+import { generateCalendarPage } from "@/utils/calendar";
+import { addDays } from "date-fns";
+import { useEffect, useState } from "react";
+import { DateRange } from "react-day-picker";
 
 export function HomePage() {
 
+	const { logout } = useAuthContext()
 
-	const api = useAPI()
+	const now = new Date()
+	const [date, setDate] = useState<DateRange | undefined>({
+		from: now,
+		to: addDays(now, 6),
+	})
 
-	const submutBtn = async () => {
-		const user = await getUserById(api, 1)
-		console.log({ user })
-	}
+	useEffect(() => {
+		console.log(generateCalendarPage(undefined, undefined, 5))
+	}, [])
 
 	return (
 		<Container>
-			<div className="">
-				thats my home page
+			<div className="flex justify-end mt-8">
+				<Button onClick={() => logout()} type="button" >Logout</Button>
 			</div>
-
-			<Button onClick={submutBtn}>Click me</Button>
+			<Calendar
+				mode="range"
+				defaultMonth={date?.from}
+				selected={date}
+				onSelect={setDate}
+				numberOfMonths={1}
+			/>
 		</Container>
 	)
 }
