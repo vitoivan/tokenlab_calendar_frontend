@@ -1,5 +1,6 @@
 import {
   createBrowserRouter,
+  Navigate,
 } from "react-router-dom";
 import { LoginPage } from "../pages/login/login";
 import { HomePage } from "@/pages/home/home";
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
   {
     path: Routes.HOME,
     element: withAuth(<HomePage />),
+  },
+  {
+    path: '/',
+    element: <Navigate to={Routes.HOME} />,
   },
   {
     path: "*",
