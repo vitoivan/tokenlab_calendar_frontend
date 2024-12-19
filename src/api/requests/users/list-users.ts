@@ -10,6 +10,9 @@ export async function listUsers(api: AxiosInstance, params: ListUserDTO): Promis
   if (params.email) {
     urlParams.append("email", params.email)
   }
+  if (params.search) {
+    urlParams.append("search", params.search)
+  }
   urlParams.append("page", params.page.toString())
   urlParams.append("limit", params.limit.toString())
 

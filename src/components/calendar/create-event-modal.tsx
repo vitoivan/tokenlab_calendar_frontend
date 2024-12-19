@@ -40,6 +40,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { User } from "@/api/models/users"
 import { listUsers } from "@/api/requests/users/list-users"
 import { setUsersToEvent } from "@/api/requests/events/set-users-to-event"
+import { useAuthContext } from "@/context/auth-context/auth-context"
+import { ScrollArea } from "../ui/scroll-area"
 
 
 export type CreateEventValues = z.infer<typeof createEventchema>
@@ -50,6 +52,8 @@ export function CreateEventModal({ open, handleClose, start, end, onSubmit }: Pr
   const [users, setUsers] = useState<User[]>([])
   const [usersSearch, setUsersSearch] = useState<string>("")
   const [selectedUsers, setSelectedUsers] = useState<User[]>([])
+
+  const { userData } = useAuthContext()
 
   const api = useAPI()
   const form = useForm<CreateEventValues>({
@@ -107,15 +111,12 @@ export function CreateEventModal({ open, handleClose, start, end, onSubmit }: Pr
   }
 
   const getUsers = useCallback((search: string) => {
-    // TODO: remove this and use an autocomplete
-    if (search.length < 3) return
-
     listUsers(api, {
       page: 1,
       limit: 100,
       search,
     }).then(data => {
-      setUsers(data.data)
+      setUsers([...data.data.filter(u => u.id !== userData!.id)])
     }).catch(err => {
       if (err instanceof AxiosError) {
         toast({
@@ -125,7 +126,7 @@ export function CreateEventModal({ open, handleClose, start, end, onSubmit }: Pr
         })
       }
     })
-  }, [api])
+  }, [api, userData])
 
   useEffect(() => {
     if (start) {
@@ -153,6 +154,7 @@ export function CreateEventModal({ open, handleClose, start, end, onSubmit }: Pr
       return
     }
     setSelectedUsers([...selectedUsers, user])
+    setUsersSearch("")
   }
 
   function handleRemoveUser(user: User) {
@@ -171,200 +173,204 @@ export function CreateEventModal({ open, handleClose, start, end, onSubmit }: Pr
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(_onSubmit)} className="w-full">
-            <div className="grid gap-4 py-4 px-0 font-sans w-full">
-              <div className="w-full">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Event name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="My event"  {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="w-full">
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm">Event description</FormLabel>
-                      <FormControl>
-                        <Input placeholder="some event ..."  {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="border border-muted p-3">
-                <h5 className="text-sm text-muted-foreground my-2">Start</h5>
-
-                <div className="flex gap-4 items-center">
+            <ScrollArea className="h-[600px] w-full rounded-md border p-2 my-4">
+              <div className="grid gap-4 py-4 px-2 font-sans w-full">
+                <div className="w-full">
                   <FormField
                     control={form.control}
-                    name="startHours"
+                    name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>hours</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value.toString().padStart(2, "0")}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an hour" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {
-                              Array.from({ length: 24 }).map((_, i) => (
-                                <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
-                                  {(i).toString().padStart(2, "0")}
-                                </SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="startMins"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>minutes</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value.toString().padStart(2, "0")}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a minute" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {
-                              Array.from({ length: 60 }).map((_, i) => (
-                                <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
-                                  {(i).toString().padStart(2, "0")}
-                                </SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
+                        <FormLabel className="text-sm">Event name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="My event"  {...field} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
-
-              <div className="border border-muted p-3">
-                <h5 className="text-sm text-muted-foreground my-2">End</h5>
-
-                <div className="flex gap-4 items-center">
+                <div className="w-full">
                   <FormField
                     control={form.control}
-                    name="endHours"
+                    name="description"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>hours</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value.toString().padStart(2, "0")}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select an hour" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {
-                              Array.from({ length: 24 }).map((_, i) => (
-                                <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
-                                  {(i).toString().padStart(2, "0")}
-                                </SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="endMins"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>minutes</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value.toString().padStart(2, "0")}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a minute" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {
-                              Array.from({ length: 60 }).map((_, i) => (
-                                <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
-                                  {(i).toString().padStart(2, "0")}
-                                </SelectItem>
-                              ))
-                            }
-                          </SelectContent>
-                        </Select>
+                        <FormLabel className="text-sm">Event description</FormLabel>
+                        <FormControl>
+                          <Input placeholder="some event ..."  {...field} />
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
-              </div>
-              <div className="w-full border border-muted p-2">
-                <h3 className="text-sm font-bold text-muted-foreground my-4">Invite users</h3>
-                <Input placeholder="users" value={usersSearch} onChange={(e) => setUsersSearch(e.target.value)} />
+                <div className="border border-muted p-3">
+                  <h5 className="text-sm text-muted-foreground my-2">Start</h5>
 
-                <div className="flex gap-2 mt-4 flex-wrap">
-                  {
-                    selectedUsers.map((user) => (
-                      <div
-                        className="bg-primary text-primary-foreground w-fit p-2 px-4 rounded-lg hover:cursor-pointer"
-                        onClick={() => handleRemoveUser(user)}
-                        key={user.id.toString() + user.email}>
-                        {user.email}
-                      </div>
-                    ))
-                  }
+                  <div className="flex gap-4 items-center">
+                    <FormField
+                      control={form.control}
+                      name="startHours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>hours</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value.toString().padStart(2, "0")}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an hour" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {
+                                Array.from({ length: 24 }).map((_, i) => (
+                                  <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
+                                    {(i).toString().padStart(2, "0")}
+                                  </SelectItem>
+                                ))
+                              }
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="startMins"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>minutes</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value.toString().padStart(2, "0")}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a minute" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {
+                                Array.from({ length: 60 }).map((_, i) => (
+                                  <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
+                                    {(i).toString().padStart(2, "0")}
+                                  </SelectItem>
+                                ))
+                              }
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
-                <div className="flex gap-2 mt-4 flex-wrap">
-                  {
-                    users
-                      .map((user) => (
+
+                <div className="border border-muted p-3">
+                  <h5 className="text-sm text-muted-foreground my-2">End</h5>
+
+                  <div className="flex gap-4 items-center">
+                    <FormField
+                      control={form.control}
+                      name="endHours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>hours</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value.toString().padStart(2, "0")}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an hour" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {
+                                Array.from({ length: 24 }).map((_, i) => (
+                                  <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
+                                    {(i).toString().padStart(2, "0")}
+                                  </SelectItem>
+                                ))
+                              }
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="endMins"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>minutes</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value.toString().padStart(2, "0")}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select a minute" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {
+                                Array.from({ length: 60 }).map((_, i) => (
+                                  <SelectItem key={i} value={(i).toString().padStart(2, "0")}>
+                                    {(i).toString().padStart(2, "0")}
+                                  </SelectItem>
+                                ))
+                              }
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </div>
+                <div className="w-full border border-muted p-2">
+                  <h3 className="text-sm font-bold text-muted-foreground my-4">Invite users</h3>
+                  <Input placeholder="users" value={usersSearch} onChange={(e) => setUsersSearch(e.target.value)} />
+
+                  <div className="flex gap-2 mt-4 flex-wrap">
+                    {
+                      selectedUsers.map((user) => (
                         <div
-                          key={user.id}
-                          className="flex gap-4 items-center text-sm my-4 hover:cursor-pointer hover:bg-muted w-fit p-2 px-4 rounded-md"
-                          onClick={() => handleSelectUser(user)}
-                        >
+                          className="bg-primary text-primary-foreground w-fit p-2 px-4 rounded-lg hover:cursor-pointer"
+                          onClick={() => handleRemoveUser(user)}
+                          key={user.id.toString() + user.email}>
                           {user.email}
                         </div>
                       ))
-                  }
+                    }
+                  </div>
+                  <div className="flex gap-2 mt-4 flex-wrap">
+                    {
+                      users
+                        .map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex gap-4 items-center text-sm my-4 hover:cursor-pointer hover:bg-muted w-fit p-2 px-4 rounded-md"
+                            onClick={() => {
+                              handleSelectUser(user)
+                            }}
+                          >
+                            {user.email}
+                          </div>
+                        ))
+                    }
+                  </div>
                 </div>
               </div>
-            </div>
+            </ScrollArea>
             <DialogFooter>
               <Button type="submit">Create</Button>
             </DialogFooter>
