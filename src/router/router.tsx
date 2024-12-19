@@ -6,7 +6,7 @@ import { HomePage } from "@/pages/home/home";
 import { withAuth } from "@/components/auth/auth";
 import { Page404 } from "@/pages/404/not-found";
 import { Routes } from "@/utils/enums";
-import { Logout } from "@/components/logout/logout";
+import { RegisterPage } from "@/pages/register/register";
 
 
 export const router = createBrowserRouter([
@@ -15,13 +15,12 @@ export const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
+    path: Routes.SIGN_UP,
+    element: <RegisterPage />,
+  },
+  {
     path: Routes.HOME,
     element: withAuth(<HomePage />),
-    loader: () => {
-      console.log("loader run")
-      return {}
-    },
-    errorElement: Logout,
   },
   {
     path: "*",

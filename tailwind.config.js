@@ -4,7 +4,8 @@ module.exports = {
         content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
         theme: {
                 fontFamily: {
-                        sans: ['Inter', 'sans-serif']
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Roboto Mono', 'sans-serif']
                 },
                 extend: {
                         borderRadius: {

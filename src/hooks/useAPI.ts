@@ -8,50 +8,50 @@ import { useMemo } from "react"
 
 export const useAPI = () => {
 
-	const { logout } = useAuthContext()
+  const { logout } = useAuthContext()
 
-	const api = useMemo(() => {
-		const env = envConfig()
+  const api = useMemo(() => {
+    const env = envConfig()
 
-		const instance = axios.create({
-			baseURL: `${env.calendarAPIURL}/api`
-		});
+    const instance = axios.create({
+      baseURL: `${env.calendarAPIURL}/api`
+    });
 
-		instance.interceptors.request.use(config => {
-			config.headers.set('Authorization', `Bearer ${LocalStorage.getString(LS_ACCESS_TOKEN_KEY) || ""}`)
-			return config
-		})
-
-
-		instance.interceptors.response.use(
-			response => response,
-			async (error: AxiosError) => {
-				const originalRequest = error.config!
-
-				const responseData = error.response?.data as any
-
-				if (error.response?.status === 401 && responseData.message.includes("token") && responseData.message.includes("refresh") === false) {
-					try {
-						const { accessToken, refreshToken } = await refreshTokenRequest(instance, LocalStorage.getString(LS_REFRESH_TOKEN_KEY) || "")
-						LocalStorage.setString(LS_ACCESS_TOKEN_KEY, accessToken)
-						LocalStorage.setString(LS_REFRESH_TOKEN_KEY, refreshToken)
-						originalRequest.headers.set('Authorization', `Bearer ${accessToken}`)
-						return await instance(originalRequest)
-					} catch (err) {
-						console.error(err)
-						logout()
-					}
+    instance.interceptors.request.use(config => {
+      config.headers.set('Authorization', `Bearer ${LocalStorage.getString(LS_ACCESS_TOKEN_KEY) || ""}`)
+      return config
+    })
 
 
-				}
+    instance.interceptors.response.use(
+      response => response,
+      async (error: AxiosError) => {
+        const originalRequest = error.config!
 
-				return Promise.reject(error)
-			},
-		)
+        const responseData = error.response?.data as any
 
-		return instance
-	}, [])
+        if (error.response?.status === 401 && responseData.message.includes("token") && responseData.message.includes("refresh") === false) {
+          try {
+            const { accessToken, refreshToken } = await refreshTokenRequest(instance, LocalStorage.getString(LS_REFRESH_TOKEN_KEY) || "")
+            LocalStorage.setString(LS_ACCESS_TOKEN_KEY, accessToken)
+            LocalStorage.setString(LS_REFRESH_TOKEN_KEY, refreshToken)
+            originalRequest.headers.set('Authorization', `Bearer ${accessToken}`)
+            return await instance(originalRequest)
+          } catch (err) {
+            console.error(err)
+            logout()
+          }
 
 
-	return api
+        }
+
+        return Promise.reject(error)
+      },
+    )
+
+    return instance
+  }, [])
+
+
+  return api
 }

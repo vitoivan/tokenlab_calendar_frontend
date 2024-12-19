@@ -3,13 +3,13 @@ import { useEffect } from "react"
 import { withAuth } from "../auth/auth"
 
 function LogoutComponent() {
-	const { logout } = useAuthContext()
+  const { logout } = useAuthContext()
 
-	useEffect(() => {
-		logout()
-	}, [logout])
+  useEffect(() => {
+    logout()
+  }, [logout])
 
-	return <></>
+  return <></>
 }
 
 export const Logout = withAuth(<LogoutComponent />)

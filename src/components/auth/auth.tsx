@@ -8,15 +8,15 @@ type Props = {
 
 export function Auth({ children }: Props) {
 
-	const { isLoggedIn } = useAuthContext()
+  const { isLoggedIn } = useAuthContext()
 
-	if (!isLoggedIn) {
-		return <Navigate to={Routes.SIGN_IN} />
-	}
+  if (!isLoggedIn) {
+    return <Navigate to={Routes.SIGN_IN} />
+  }
 
-	return children
+  return children
 }
 
 export function withAuth(component: JSX.Element) {
-	return <Auth>{component}</Auth>
+  return <Auth>{component}</Auth>
 }
